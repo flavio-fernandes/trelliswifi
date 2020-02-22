@@ -251,8 +251,8 @@ void mqtt1MinTick() {
     // Note that periodic pings are expected to take place as slow as 10 minutes, so we
     // shall be generous here.
     if (state.minutes_since_periodic_ping > 21) {
-      gameOver("Too long without a periodic ping event");
-      return;
+      //gameOver("Too long without a periodic ping event");
+      //return;
     }
 
     state.minutes_since_periodic_ping += 1;
