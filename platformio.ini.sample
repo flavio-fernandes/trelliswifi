@@ -1,0 +1,44 @@
+; PlatformIO Project Configuration File -- Reference example
+; Rename this file to platformio.ini and tweak the parameters below
+;
+;   Build options: build flags, source filter
+;   Upload options: custom upload port, speed and extra flags
+;   Library options: dependencies, extra library storages
+;   Advanced options: extra scripting
+;
+; Please visit documentation for the other options and examples
+; https://docs.platformio.org/page/projectconf.html
+
+[env:featheresp32]
+platform = espressif32
+board = featheresp32
+board_build.mcu = esp32
+framework = arduino
+;; build_flags =
+;;  -DDEBUG
+
+;; Example settings for looking at serial output. Make sure to
+;; define DEBUG, as shown in file common.h
+;monitor_port = /dev/cu.usbserial-1410
+monitor_speed = 115200
+
+;; For using OTA, use these settings as reference. The port and
+;; password must match what is provided in include/netConfig.h file
+;upload_protocol = espota
+;upload_port = 192.168.10.202
+;upload_flags = 
+;	--port=8266
+;	--auth=fa2bf646e49ab5e56f2b74480ba61017
+
+
+; Library options
+lib_ldf_mode = chain+
+lib_ignore =
+	WiFi101
+lib_deps =
+	SPI
+	adafruit/Adafruit MQTT Library @ ^2.0.0
+	adafruit/Adafruit seesaw Library @ ^1.5.6
+	sstaub/Ticker @ ^4.0.0
+	bblanchon/ArduinoJson @ ^6.18.5
+	tzapu/WiFiManager @ 2.0.5-beta+sha.8452df7

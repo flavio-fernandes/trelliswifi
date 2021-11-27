@@ -1,0 +1,16 @@
+// This is a reference example of what the compiler will use for network configuration.
+// Rename this file to netConfig.h and tweak the parameters below.
+#ifndef _NETCONFIG_H
+
+#define _NETCONFIG_H
+
+// Over the air update support knobs
+#define OTA_PORT        8266
+
+// If you want to password protect the OTA access, use either OTA_PASS or OTA_MD5
+// Look at platformio.ini to see how to use these parameters.
+// $ md5 -s "super_secret" --> MD5 ("super_secret") = fa2bf646e49ab5e56f2b74480ba61017
+//#define OTA_PASS      "super_secret"
+//#define OTA_MD5       "fa2bf646e49ab5e56f2b74480ba61017"
+
+#endif // _NETCONFIG_H

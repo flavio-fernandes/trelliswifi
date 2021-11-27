@@ -2,8 +2,10 @@
 
 #define _MY_WIFI_CNF_H
 
+#include <Arduino.h>
+
 #define DEFAULT_MQTT_TOPIC "/trelliswifi/"
-#define DEFAULT_MQTT_PORT  "1883"
+#define DEFAULT_MQTT_PORT "1883"
 
 // Define this in order to force clear setting upon call
 // to wifiConfig_init(). The value should be a valid GPIO
@@ -11,7 +13,8 @@
 // during wifiConfig_init(), then all nvs will get erased.
 // #define NV_CLEAR_BUTTON_CHECK 32
 
-typedef struct WifiConfigData_t {
+typedef struct WifiConfigData_t
+{
   String wifiSsid;
   String wifiPass;
   String mqttServer;
@@ -19,9 +22,10 @@ typedef struct WifiConfigData_t {
   String mqttUsername;
   String mqttPassword;
   String mqttTopic;
+  bool needPeriodicPings;
 } WifiConfigData;
 
 void wifiConfig_init(bool forceNvClear);
-const struct WifiConfigData_t& wifiConfig_get();
+const struct WifiConfigData_t &wifiConfig_get();
 
-#endif  // define _MY_WIFI_CNF_H
+#endif // define _MY_WIFI_CNF_H

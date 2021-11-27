@@ -6,8 +6,8 @@
 
 extern TrellisCallback keyPressCallback(keyEvent evt);
 
-#define Y_DIM 8 //number of rows of key
-#define X_DIM 8 //number of columns of keys
+#define Y_DIM 8 // number of rows of key
+#define X_DIM 8 // number of columns of keys
 
 extern const uint32_t minPressThreshold;
 extern const uint32_t longPressThreshold;

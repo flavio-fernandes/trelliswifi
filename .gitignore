@@ -1,1 +1,7 @@
+.pio
+.vscode
+junk
+.DS_Store
+include/netConfig.h
+platformio.ini
 *~

@@ -11,13 +11,12 @@
 
 static const unsigned int defaultMqttReconnect = 30;
 
-typedef struct {
+typedef struct
+{
   bool lastMqttConnected;
-  unsigned int reconnectTicks;  // do not mqtt connect while this is > 0
+  unsigned int reconnectTicks; // do not mqtt connect while this is > 0
 } MqttState;
 
 extern MqttState mqttState;
 
-
-
-#endif  // define _MY_MQTT_CLIENT_H
+#endif // define _MY_MQTT_CLIENT_H
