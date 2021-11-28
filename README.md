@@ -18,14 +18,12 @@ Built-in animations are implemented to allow LEDs under buttons to blink, pulse 
 change colors. At this point, it is generic enough to be used as a frontend for
 controlling anything while providing 64 RGBs as a feedback display. :sparkles:
 
+[![Watch the video](https://img.youtube.com/vi/qqpkBH1jO0A/default.jpg)](https://youtu.be/qqpkBH1jO0A)
+
 ## Hardware
 
-As of now, this project is picky about the hardware it uses.
-More specifically, it is written for an 8x8 NeoTrellis setup with a Huzzah ESP feather.
-The non-volatile storage part of this project is based on ESP32's
+This project is written for an 8x8 NeoTrellis setup with a Huzzah ESP32 feather. The non-volatile storage part of this project leverages the ESP32's
 [preferences library](https://github.com/espressif/arduino-esp32/blob/master/libraries/Preferences/src/Preferences.h).
-So, a few tweaks to the code -- nothing earth-shattering :sweat_smile: -- would also be needed in order to make
-it work on non-ESP32 micro-controllers.
 
 **All parts can be purchased at [my favorite DIY store (aka Adafruit)](https://adafruit.com)**:
 
@@ -46,180 +44,92 @@ The 8x8 setup is comprised of four 4x4 [keypads](https://www.adafruit.com/produc
 of them must have a unique I2C address. Make sure to address them properly by
 leaving one untouched, bridging "A0" on the second, "A1" on the third, and both "A0+A1" on the fourth. If
 you use a different configuration, tweak
-[the code here](https://github.com/flavio-fernandes/trelliswifi/blob/stable/lights.ino#L16-L19) before
-[uploading the project](https://github.com/flavio-fernandes/trelliswifi/blob/stable/README.md#compile-and-upload)
-to your ESP32 board.
+[the code here](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/lights.cpp#L19-L22) before uploading the project to your ESP32 board.
 
 ## Software
 
-### Board Manager
+### Pre-requisites
 
-First, follow the
-[steps described on this page](https://github.com/espressif/arduino-esp32/blob/master/docs/arduino-ide/boards_manager.md)
-to make the
-[Arduino IDE](https://www.arduino.cc/en/Main/Software)
-work with the [Espressif ESP32 board](https://www.espressif.com/en/products/hardware/esp32/overview).
-I found that [this page](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/) offers good details
-about this but uses a different value for the board manager URL. And since I use both ESP32 and the ESP8266 boards with the Arduino IDE,
-the **Additional Board Manager URLs** field in my system looks like this:
+- [platformio.org](https://platformio.org/) environment (see [platformio-ide](https://platformio.org/platformio-ide)) with [vscode](https://docs.platformio.org/en/latest/integration/ide/vscode.html)
+- WIFI and an MQTT server
 
-```text
-https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json, http://arduino.esp8266.com/stable/package_esp8266com_index.json
-```
+If you do not want to set an MQTT server up, consider [using a public](https://github.com/mqtt/mqtt.github.io/wiki/public_brokers) one, like [Adafruit.IO](https://io.adafruit.com/)
 
-After that, you will be able to search and find ESP32 from the **Tools ==> Boards ==> Boards Manager...** menu. The image
-below is what it looks like in my system. Feel free to use a version newer than 1.0.4.
+### Configuration
 
-![Trellis Wifi setup -- Arduino Boards Manager ESP32](https://i.imgur.com/J6BvLBb.png)
+After cloning this repo, there are 2 files that you will need to modify before being able to
+compile and upload the code:
 
-Once that is done, select **Tools ==> Board ==> Adafruit ESP32 Feather**. For my setup, this is how that looks like:
+#### (1) **platformio.ini**
 
-![ESP32 Arduino IDE Settings](https://i.imgur.com/VeFZDy7.png)
+Rename _[platformio.ini.sample](https://github.com/flavio-fernandes/trelliswifi/blob/master/platformio.ini.sample)_ to _platformio.ini_ and change any settings you would like.
 
-### Library manager
+#### (2) **include/netConfig.h**
 
-:bangbang:
-You need additional libraries to build trelliswifi. Install them in the libraries folder, which is located under
-your sketchbook folder. If you are not sure where that is in your system, open the **Arduino ==> Preferences...** menu. It should look like this:
-
-![Arduino IDE project and libraries folder](https://i.imgur.com/S2IPe8Q.png)
-
-#### Download the trellis-wifi project
-
-```bash
-$ cd ${sketchbook_folder} ; # use the folder you see in the preferences menu mentioned above
-$ [ ! -e stable.zip ] && curl -L -O https://github.com/flavio-fernandes/trelliswifi/archive/stable.zip ; \
-  [ ! -d trelliswifi-stable ] && unzip stable.zip && rm -f stable.zip ; \
-  [ ! -d trelliswifi ] && mv -v trelliswifi-stable trelliswifi
-$ open ./trelliswifi/trelliswifi.ino
-```
-
-These are the required libraries:
-
-- ArduinoJson
-- Adafruit_seesaw_Library
-- Adafruit_MQTT_Library
-- TickerScheduler
-- WiFiManager
-
-#### Download ArduinoJson
-
-Open **Sketch ==> Include Library ==> Manager Libraries...**
-In the search field, type **ArduinoJson**.
-I installed version 6.14.1, but anything newer should be okay, too.
-
-#### Download Adafruit_seesaw_Library
-
-Just like you install _ArduinoJson_, open **Sketch ==> Include Library ==> Manager Libraries...**
-In the search field, type **Adafruit_seesaw_Library**.
-I installed version 1.3.0, but anything newer should work just fine.
-
-:warning:
-This library depends on other libraries. It is likely that you will be prompted to install them.
-If so, select **Install all** to satisfy all these dependencies.
-
-#### Download Adafruit_MQTT_Library
-
-This project uses version 1.0.3 of this library with a
-[bugfix](https://github.com/adafruit/Adafruit_MQTT_Library/pull/166) that has not been merged yet.
-This is how to install it:
-
-```bash
-$ cd ${sketchbook_folder}/libraries
-$ [ ! -e trelliswifi.zip ] && curl -L -O https://github.com/flavio-fernandes/Adafruit_MQTT_Library/archive/trelliswifi.zip ; \
-  [ ! -d Adafruit_MQTT_Library-trelliswifi ] && unzip trelliswifi.zip && rm -f trelliswifi.zip ; \
-  [ ! -d Adafruit_MQTT_Library ] && mv -v Adafruit_MQTT_Library-trelliswifi Adafruit_MQTT_Library
-```
-
-#### Download TickerScheduler
-
-This project leverages the awesome [TickerScheduler](https://github.com/Toshik/TickerScheduler)
-library written by [Toshik](https://github.com/Toshik)
-in order to perform periodic tasks.
-Small changes, now [merged](https://github.com/Toshik/TickerScheduler/pull/22),
-were needed to make it support ESP32.
-This is a way of adding it to libraries:
-
-```bash
-$ cd ${sketchbook_folder}/libraries
-$ [ ! -e trelliswifi.zip ] && curl -L -O https://github.com/flavio-fernandes/TickerScheduler/archive/trelliswifi.zip ; \
-  [ ! -d TickerScheduler-trelliswifi ] && unzip trelliswifi.zip && rm -f trelliswifi.zip ; \
-  [ ! -d TickerScheduler ] && mv -v TickerScheduler-trelliswifi TickerScheduler
-```
-
-#### Download WiFiManager
-
-Last but far from least, trelliswifi rides on the shoulders of [tzapu](https://tzapu.com/) giant to leverage
-[WiFiManager](https://github.com/tzapu/WiFiManager). This gives us a server portal for storing non-volatile
-info such as SSID and MQTT server. More info on that later on. For now, follow these commands
-to make it part of your Arduino library:
-
-```bash
-$ cd ${sketchbook_folder}/libraries
-$ [ ! -e trelliswifi.zip ] && curl -L -O https://github.com/flavio-fernandes/WiFiManager/archive/trelliswifi.zip ; \
-  [ ! -d WiFiManager-trelliswifi ] && unzip trelliswifi.zip && rm -f trelliswifi.zip ; \
-  [ ! -d WiFiManager ] && mv -v WiFiManager-trelliswifi WiFiManager
-```
+Rename _[netConfig.h.sample](https://github.com/flavio-fernandes/trelliswifi/blob/master/include/netConfig.h.sample)_ to _netConfig.h_ . Note that for using OTA, the settings here must match what you configured in _platformio.ini_
 
 #### :checkered_flag: Compile and Upload
 
-If you made it here, you should be able to compile and
-[upload](https://www.dummies.com/computers/arduino/how-to-upload-a-sketch-to-an-arduino/)
-the project to your ESP32. Nice going! :clap:
+:construction: At the time of this writing, there is [a bug](https://github.com/adafruit/Adafruit_BusIO/issues/69) in [Adafruit_BusIO](https://github.com/adafruit/Adafruit_BusIO) library that will make compilation fail as follows:
+
+```
+.pio/libdeps/esp32dev/Adafruit BusIO@src-de43b9da31d281331630329764ceaa16/Adafruit_I2CDevice.cpp: In member function 'void Adafruit_I2CDevice::end()':
+.pio/libdeps/esp32dev/Adafruit BusIO@src-de43b9da31d281331630329764ceaa16/Adafruit_I2CDevice.cpp:44:10: error: 'class TwoWire' has no member named 'end'
+   _wire->end();
+```
+
+The fix has already [been merged](https://github.com/adafruit/Adafruit_BusIO/pull/70), but if you need to work around it, simply make the changes locally to match what is done in that PR. :sweat_smile:
 
 ### Initial configuration of MQTT and topic
 
 It is time to jump into the temporary webserver started by your ESP, so you can provide details on the
 Wifi and MQTT server it should connect to every time it boots. This is likely something you will just do
-once per device, since the config is kept in non-volatile memory.
+once per device since the config is kept in non-volatile memory.
 
 #### Connect to ESP's temporary AP
 
 When booted for the first time -- or when you force the device to do so
-([section below](https://github.com/flavio-fernandes/trelliswifi/blob/stable/README.md#recycle-resettingchanging-values-in-non-volatile-memory))
+([section below](https://github.com/flavio-fernandes/trelliswifi#recycle-resettingchanging-values-in-non-volatile-memory))
 -- the ESP will boot as an
 access point and start to broadcast its own SSID. I can't tell you what that SSID will be because each ESP
 comes with a unique MAC address. Simply look for SSIDs that start with the name **ESP32_**.
 
-Once Wifi connection is established, you should be presented with the WiFiManager window. If that is not the
-case, open your browser and connect to the [portal url](http://192.168.4.1/):
+Once a Wifi connection is established, you should be presented with the WiFiManager window. If that is not the
+case, open your browser and connect to the [portal URL](http://192.168.4.1/):
 
 **http://192.168.4.1/**
 
-
 A couple of caveats you should keep in mind while configuring your device:
 
-- The current version of WifiManager has a [bug on getting the wifi password](https://github.com/tzapu/WiFiManager/issues/1004#issuecomment-583666829). To work around this issue, make sure to provide the Wifi password on both fields of the form.  :dizzy_face:
-- Use a unique topic prefix and do not forget the value you used. It should start and end with the **/** character, as
+- Use a unique topic prefix and do not forget the value you used. It should end with the **/** character, as
 shown below. The default value used for this field is **/trelliswifi/**
 - The MQTT server is mandatory. It can be an IP address or a [FQDN](https://kb.iu.edu/d/aiuv) (like io.adafruit.com).
 - MQTT username and password fields are optional, depending on the server you use.
 
-![WiFi Manager Example](https://i.imgur.com/KSHvyWz.png)
+![WiFi Manager Example](https://i.imgur.com/A90sNwd.png)
 
 ### :recycle: Resetting/changing values in non-volatile memory
 
 Let's say you need to change the non-volatile setting or would like to wipe the existing values. No problem! :relaxed:
 
-In [less than 2 minutes](https://github.com/flavio-fernandes/trelliswifi/blob/stable/myMqttClient.ino#L376-L382)
+In [less than 2 minutes](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/net.cpp#L545-L553)
 after turning the device on, do a "long press" on the 4 corner buttons. Long press means pressing
 down the button until it turns solid purple.
 
 ![Factory Reset Mode](https://i.imgur.com/vG5BZrs.jpg)
 
 This will make the trelliswifi clear all settings and restart its internal web server, as explained
-[above](https://github.com/flavio-fernandes/trelliswifi/blob/stable/README.md#initial-configuration-of-mqtt-and-topic).
+[above](https://github.com/flavio-fernandes/trelliswifi#initial-configuration-of-mqtt-and-topic).
 Clean, rinse and repeat. :bowtie:
 
 ## Animate via built-in button pushes
 
 Before interacting with the device via network messages, try holding down button 8 until it turns purple and release it.
-As a point of reference, that is the corner button on the edge farthest away from the feather micro-controller.
-If it all goes well, all LEDs should turn on white. Short pressing the same button (a second or two)
+As a point of reference, that is one of the 4 corner buttons. Which corner depends on the IC2 addresses used. If it all goes well, all LEDs should turn on white. Short pressing the same button (a second or two)
 should undo that behavior.
 
-Next, try long-pressing button 8 and button 16. Short pressing them should make the animation stop.
-For all the built-in animations, look at the [localButtonProcess function](https://github.com/flavio-fernandes/trelliswifi/blob/stable/animations.ino#L16-L56).
+Next, try long-pressing buttons 8 and 16. Short pressing them should make the animation stop.
+For all the built-in animations, look at the [localButtonProcess function](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/animations.cpp#L18-L35).
 You will see pairs of 64 bitmasks for each animation. The first pair value represents the
 buttons that need to be short pressed and the second bitmask is for the buttons that have to be held down until they
 turn purple (aka long press).
@@ -230,14 +140,14 @@ turn purple (aka long press).
 
 Once trelliswifi is able to establish a connection with the configured MQTT server, there
 are all sorts of fun you can have with it. The device will publish into 5 different MQTT topics
-to provide updates on its current state. First, it may be better to explain how to get them and then
+to provide updates on its current state. First, it may be better to explain how to get them, and then
 we can dive into each one of these topics.
 
 #### Install MQTT client so you can interact with trelliswifi
 
 Any MQTT client will work. The one I use quite often and really like is called Mosquitto.
 More info at [mosquitto.org/download/](https://mosquitto.org/download/).
-Here is a cheat sheet set of commands for easily getting it in your computer:
+Here is a cheat sheet set of commands for easily getting it on your computer:
 
 ```bash
 $ # If you are using Debian / Ubuntu / Raspberry-Pi:
@@ -264,7 +174,7 @@ you can just use a known public server, like [io.adafruit.com](https://io.adafru
 in [mqtt.github.io](https://github.com/mqtt/mqtt.github.io/wiki/public_brokers).
 
 :exclamation: It is important that you have the same **MQTT server** value
-[configured](https://github.com/flavio-fernandes/trelliswifi/blob/stable/README.md#connect-to-esps-temporary-ap)
+[configured](https://github.com/flavio-fernandes/trelliswifi#connect-to-esps-temporary-ap)
 for the trelliswifi device you use. The same goes for the **MQTT topic prefix** attribute.
 
 #### Subscribing to events generated by trelliswifi device
@@ -282,12 +192,12 @@ mosquitto_sub -F '@Y-@m-@dT@H:@M:@S@z : %q : %t : %p' -h $MQTT \
 ```
 
 At this point, try pressing and releasing a button. That will trigger the device to publish a "_buttons_" event.
-Do you see it? Without closing the _mosquitto_sub_ command, open a new session and let's poke the device to
+Do you see it? Without closing the _mosquitto_sub_ command, open a new session, and let's poke the device to
 generate the other 4 topics:
 
 ```bash
 MQTT=test.mosquitto.org  ; # replace this with whatever you decide to use as MQTT server
-PREFIX_CONFIGURED=trelliswifi ; # replace this value with whatever you configured in web portal
+PREFIX_CONFIGURED=trelliswifi ; # replace this value with whatever you configured in the web portal
 
 mosquitto_pub -h $MQTT -t "/${PREFIX_CONFIGURED}/ping" -n
 ```
@@ -299,31 +209,32 @@ Here is a sample output:
 2020-02-22T20:06:06-0500 : 0 : /trelliswifi/battery : {"volts":"3.70","isLow":"no"}
 2020-02-22T20:06:06-0500 : 0 : /trelliswifi/uptime : {"up":"14","mqttUp":"14","dog":"14"}
 2020-02-22T20:06:06-0500 : 0 : /trelliswifi/memory : {"maxMsg":"105","freeKb":"246","minFreeKb":"244","maxAllocKb":"111"}
-2020-02-22T20:06:06-0500 : 0 : /trelliswifi/etc : {"pixelsOn":"0x0000000000000000","lightUnitsSize":"0"}
+2020-02-22T20:06:06-0500 : 0 : /trelliswifi/etc : {"pixelsOn":"0x0000000000000000","lightUnitsSize":"0","watchDog":"no"}
 ```
 
 More info on each one of the topics you are seeing:
 
 - /${PREFIX_CONFIGURED}/**buttons**
-  - Gives you 3 hexadecimal values [that represent](https://github.com/flavio-fernandes/trelliswifi/blob/stable/buttons.ino#L5-L7):
+  - Gives you 3 hexadecimal values [that represent](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/buttons.cpp#L6-L8):
     - (p) buttons that were pressed and released between 200 milliseconds and 2.4 seconds
     - (l) buttons that were pressed and held for longer than 2.4 seconds
     - (x) buttons held down for longer than 15 seconds
 - /${PREFIX_CONFIGURED}/**battery**
   - Tells you the current battery voltage
-  - Gives an "isLow" boolean, which gets set as _true_ when [battery output is less than 3.45 volts](https://github.com/flavio-fernandes/trelliswifi/blob/stable/trelliswifi.ino#L94-L101)
+  - Gives an "isLow" boolean, which gets set as _true_ when [battery output is less than 3.45 volts](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/main.cpp#L79-L88)
 - /${PREFIX_CONFIGURED}/**memory**
-  - Basic runtime info on [memory usage](https://github.com/flavio-fernandes/trelliswifi/blob/stable/myMqttClient.ino#L337-L340) of ESP
+  - Basic runtime info on [memory usage](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/net.cpp#L493-L499) of ESP
 - /${PREFIX_CONFIGURED}/**uptime**
   - Gives you info on how long trelliswifi has been operational
     - **up**: minutes since it was turned on
     - **mqttUp**: minutes since last time it connected to MQTT server
     - **dog**: increases every minute, and gets reset when a specific MQTT request is received:
       - mosquitto_pub -h $MQTT -t "/${PREFIX_CONFIGURED}/ping" -m periodic
-      - For more info on how that can be used, see [this commit](https://github.com/flavio-fernandes/trelliswifi/commit/a67e05800810056a37f86ed2c42648838083c641)
+      - For more info on how that is used, see [this code](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/net.cpp#L386-L387) and check the box that says 'needs periodic pings' in the web portal.
 - /${PREFIX_CONFIGURED}/**etc**
   - Gives a bitmask in hexadecimal, representing which LEDs are currently on
-  - It also tells how many _light unit entries_ are in use. More on that [later on](https://github.com/flavio-fernandes/trelliswifi/blob/stable/README.md#light-unit-entries), but these are created/deleted via the set/rm commands. Keep reading to learn more.
+  - The current 'needs periodic pings' configuration is available via the 'watchDog' attribute here.
+  - It also tells how many _light unit entries_ are in use. More on that [later on](https://github.com/flavio-fernandes/trelliswifi#light-unit-entries), but these are created/deleted via the set/rm commands.
 
 ### Publishing events
 
@@ -331,7 +242,7 @@ The trelliswifi device subscribes to **ping** and **cmd** topics in order to han
 
 At this point, there is not much more to say about the _ping_ topic. It is simply a way of prompting
 for status as well as resetting the watchdog. These status topics are
-[generated every 10 minutes](https://github.com/flavio-fernandes/trelliswifi/blob/stable/myMqttClient.ino#L265-L272),
+[generated every 10 minutes](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/net.cpp#L401-L410),
 regardless of the _ping_ message.
 
 #### The /${PREFIX_CONFIGURED}/**cmd** topic
@@ -344,9 +255,9 @@ regardless of the _ping_ message.
 
 #### Animations
 
-These are actually built-in entries that use [id](https://github.com/flavio-fernandes/trelliswifi/blob/stable/animations.ino#L8) [511](https://github.com/flavio-fernandes/trelliswifi/blob/stable/lightUnit.h#L11). There is nothing special about that id; it's just a number.
+These are actually built-in entries that use [id](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/animations.cpp#L10) [511](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/lightUnit.h#L11). There is nothing special about that id; it's just a number.
 
-The name simply maps to a pre-built function. See [initCmdOpHandlers](https://github.com/flavio-fernandes/trelliswifi/blob/stable/msgHandler.ino#L133-L156)
+The name simply maps to a pre-built function. See [initCmdOpHandlers](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/msgHandler.cpp#L181-L204)
 if you are interested in learning how that was coded.
 
 Give them a spin, using these example commands:
@@ -369,12 +280,12 @@ mosquitto_pub -h $MQTT -t $TOPIC -m '{"op" : "rm", "id": "511"}'
 #### Light Unit Entries
 
 At the heart of the display implementation, the trelliswifi code handles
-[entries](https://github.com/flavio-fernandes/trelliswifi/blob/stable/lightUnit.ino#L6-L7)
-called [LightUnit](https://github.com/flavio-fernandes/trelliswifi/blob/stable/lightUnit.h#L38-L47).
+[entries](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/lightUnit.cpp#L7-L8)
+called [LightUnit](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/lightUnit.h#L40-L50).
 That is implemented using the [C++ STL map](http://www.cplusplus.com/reference/map/map/).
 
 You can get a good feel for all the attributes you can associate with an entry by looking at
-the [file lightUnit.h](https://github.com/flavio-fernandes/trelliswifi/blob/stable/lightUnit.h).
+the [file lightUnit.h](https://github.com/flavio-fernandes/trelliswifi/blob/master/src/lightUnit.h).
 
 ```c++
 typedef struct LightUnit_t {
@@ -403,7 +314,7 @@ typedef struct LightUnitAnimation_t {
 ```
 
 In order to be super flexible on what and how to display things, the **cmd** uses JSON strings.
-The [MQTT library limits](https://github.com/flavio-fernandes/Adafruit_MQTT_Library/blob/trelliswifi/Adafruit_MQTT.h#L98)
+The [MQTT library limits](https://github.com/adafruit/Adafruit_MQTT_Library/blob/223d419ebdff8f594da6132755628b12ecbbf7d7/Adafruit_MQTT.h#L110)
 how long these strings can be, but nothing stops you from tweaking that! The ESP32 can totally handle more
 than 150 bytes, but many original Arduino boards don't have much memory.
 **set cmd** takes an optional **id**, which allows us to break the attributes of a given
@@ -449,7 +360,7 @@ mosquitto_pub -h $MQTT -t $TOPIC -m '{"op" : "set", "animation": {"expiration":1
 
 :boom:
 As you may have noticed, **pixelMask** is a bitmask that
-[can represent all 64 LEDs](https://github.com/flavio-fernandes/trelliswifi/blob/stable/msgHandler.ino#L50-L61)
+[can represent all 64 LEDs](https://github.com/flavio-fernandes/trelliswifi/blob/f9d5205d429969cbee1299608cc529e23655c9d0/src/msgHandler.cpp#L54-L80)
 in the device. Unfortunately, a single integer value can only hold up to 40 bits in ArduinoJson library (0x8000000000).
 There are 3 workarounds for dealing with this limitation:
 1) shift: If you need to reach beyond bit 40, use "pixelMask" with a single integer and then "pixelShiftUp". Examples below use that
@@ -520,9 +431,5 @@ can be leveraged to do the amazing IoT things you do. Enjoy!  :revolving_hearts:
 
 - Make I2C address used for Trellis keypad configurable and stored in non-volatile memory (via WIFI Manager)
 - Add buzzer for sounds :musical_score:
-- Make it work on a non-ESP32 platform
 - Adapt for Trellis of different sizes
-- Use it to control [house sprinklers on Opensprinkler](https://opensprinkler.com/product/opensprinkler-pi/)
-- Make an app that uses Trellis as a gamepad/scratchpad
-- Enable [watchdog](https://github.com/flavio-fernandes/trelliswifi/commit/a67e05800810056a37f86ed2c42648838083c641) via WifiManager and keep that as part of non-volatile attributes
-
+- Document how this gizmo is used together with [github.com/flavio-fernandes/mqtt2cmd](https://github.com/flavio-fernandes/mqtt2cmd/blob/ad14873e051e48ba01b3c93434e8daf32e608004/data/config.yaml.flaviof#L21)

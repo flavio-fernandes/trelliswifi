@@ -431,9 +431,7 @@ static inline void buffToDoc(const char *const valueName)
     msgDoc[valueName] = String(msgBuff);
 }
 
-// HACK ALERT! No idea but the compiler would just play ball with me when passing
-// Adafruit_MQTT_Publish as a reference. So I gave up and made it a void*
-static bool sendCommon(const char *const eventName, /*Adafruit_MQTT_Publish*/ void *pubRawPtr)
+static bool sendCommon(const char *const eventName, Adafruit_MQTT_Publish* pubPtr)
 {
     Adafruit_MQTT_Client &mqtt = *mqttConfig.mqttPtr;
     const size_t memoryUsage = msgDoc.memoryUsage();
@@ -442,8 +440,7 @@ static bool sendCommon(const char *const eventName, /*Adafruit_MQTT_Publish*/ vo
     Serial.printf(" Memory used: %zu\n", memoryUsage);
 #endif
     serializeJson(msgDoc, msgBuff, sizeOfMsgBuff);
-    Adafruit_MQTT_Publish *const pub = reinterpret_cast<Adafruit_MQTT_Publish *>(pubRawPtr);
-    if (!(*pub).publish(msgBuff))
+    if (! (*pubPtr).publish(msgBuff))
     {
 #ifdef DEBUG
         Serial.printf("Unable to publish %s\n", eventName);

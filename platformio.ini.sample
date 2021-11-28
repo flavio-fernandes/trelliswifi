@@ -24,8 +24,9 @@ monitor_speed = 115200
 
 ;; For using OTA, use these settings as reference. The port and
 ;; password must match what is provided in include/netConfig.h file
+;; Also, do not forget to set the upload_port.
 ;upload_protocol = espota
-;upload_port = 192.168.10.202
+;upload_port = 192.168.y.x
 ;upload_flags = 
 ;	--port=8266
 ;	--auth=fa2bf646e49ab5e56f2b74480ba61017

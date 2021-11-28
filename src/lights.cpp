@@ -128,10 +128,6 @@ static uint64_t unpressedButtonUpdate()
   return unpressedMask;
 }
 
-// HACK ALERT! No idea but it really needs the line below in order to
-// compile :(
-extern TrellisCallback keyPressCallback(keyEvent evt);
-
 void initTrellis(TickerScheduler &ts)
 {
   if (!trellis.begin())
@@ -363,7 +359,7 @@ void lightUnitFinalIteration(void * /*LightUnit**/ lightUnitPtr,
 static void refreshLights()
 {
   const int origCacheVersion = pixelColorCacheVersion;
-  LightUnit *unitPtr = reinterpret_cast<LightUnit *>(getFirstLightUnit());
+  LightUnit *unitPtr = getFirstLightUnit();
   while (unitPtr != nullptr)
   {
     LightUnit &unit = *unitPtr;
@@ -385,7 +381,7 @@ static void refreshLights()
       if (isExpired)
         rmLightUnit(currId);
     }
-    unitPtr = reinterpret_cast<LightUnit *>(getNextLightUnit(currId));
+    unitPtr = getNextLightUnit(currId);
   }
 
   // New version means we need to refresh trellis

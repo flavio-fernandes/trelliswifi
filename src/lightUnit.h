@@ -54,8 +54,8 @@ void setLightUnit(LightUnitId id, const LightUnit &lightUnit, bool rmBeforeAdd =
 void rmLightUnit(LightUnitId id);
 void rmLightUnits();
 bool lightUnitExists(LightUnitId id, LightUnit *lightUnitPtr = nullptr);
-void * /*LightUnit**/ getFirstLightUnit();
-void * /*LightUnit**/ getNextLightUnit(LightUnitId id);
+LightUnit * getFirstLightUnit();
+LightUnit * getNextLightUnit(LightUnitId id);
 // uint32_t lightUnitsSize();  // moved to common.h
 bool equivalentLightUnits(const LightUnit &left, const LightUnit &right);
 void dumpLightUnit(const LightUnit &lightUnit, const char *msg = 0);

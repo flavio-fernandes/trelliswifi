@@ -119,14 +119,14 @@ bool lightUnitExists(int /*LightUnitId*/ id, LightUnit *lightUnitPtr)
   return result;
 }
 
-void * /*LightUnit**/ getFirstLightUnit()
+LightUnit * getFirstLightUnit()
 {
   // Note: iterate backwards to give priority to ids explicitly used
   auto iter(lightUnits.rbegin());
   return (iter == lightUnits.rend()) ? nullptr : &(*iter).second;
 }
 
-void * /*LightUnit**/ getNextLightUnit(LightUnitId id)
+LightUnit * getNextLightUnit(LightUnitId id)
 {
   // Note: iterate backwards to give priority to ids explicitly used
   // https://stackoverflow.com/questions/23011463/how-to-find-the-first-value-less-than-the-search-key-with-stl-set
