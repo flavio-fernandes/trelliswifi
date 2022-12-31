@@ -40,6 +40,5 @@ lib_deps =
 	SPI
 	adafruit/Adafruit MQTT Library @ ^2.0.0
 	adafruit/Adafruit seesaw Library @ ^1.5.6
-	sstaub/Ticker @ ^4.0.0
 	bblanchon/ArduinoJson @ ^6.18.5
-	tzapu/WiFiManager @ 2.0.5-beta+sha.8452df7
+	https://github.com/flavio-fernandes/WiFiManager.git#trelliswifi

@@ -2,6 +2,30 @@
 
 #include "tickerScheduler.h"
 
+void setExpired(bool *expiredPtr)
+{
+    *expiredPtr = true;
+}
+
+TsTicker::~TsTicker()
+{
+    ticker.detach();
+}
+
+void TsTicker::start()
+{
+    ticker.attach_ms(this->timer_milliseconds, setExpired, &this->expired);
+}
+
+void TsTicker::update()
+{
+    if (this->expired)
+    {
+        this->expired = false;
+        this->callback();
+    }
+}
+
 TickerScheduler::TickerScheduler() : tickers()
 {
 }
@@ -15,11 +39,11 @@ TickerScheduler::~TickerScheduler()
     tickers.clear();
 }
 
-Ticker &TickerScheduler::add(fptr callback, uint32_t timer, uint32_t repeat, resolution_t resolution)
+TsTicker &TickerScheduler::add(callback_t callback, uint32_t timer_milliseconds)
 {
-    auto tickerPtr = new Ticker(callback, timer, repeat, resolution);
-    tickers.push_back(tickerPtr);
-    return *tickerPtr;
+    auto tsTickerPtr = new TsTicker(callback, timer_milliseconds);
+    tickers.push_back(tsTickerPtr);
+    return *tsTickerPtr;
 }
 
 void TickerScheduler::update()

@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <inttypes.h>
+#include <Arduino.h>
 
 class TickerScheduler;
 

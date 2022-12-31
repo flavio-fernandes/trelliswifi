@@ -18,8 +18,8 @@ static const uint32_t cacheDirtyBit = 1 << 31;
 
 // Create a matrix of trellis panels, using addressed soldered in
 Adafruit_NeoTrellis t_array[Y_DIM / 4][X_DIM / 4] = {
-    {Adafruit_NeoTrellis(0x2E), Adafruit_NeoTrellis(0x2F)},
-    {Adafruit_NeoTrellis(0x30), Adafruit_NeoTrellis(0x31)}};
+    {Adafruit_NeoTrellis(0x30), Adafruit_NeoTrellis(0x31)},
+    {Adafruit_NeoTrellis(0x2E), Adafruit_NeoTrellis(0x2F)}};
 
 // Pass this matrix to the multitrellis object
 Adafruit_MultiTrellis trellis((Adafruit_NeoTrellis *)t_array, Y_DIM / 4, X_DIM / 4);
