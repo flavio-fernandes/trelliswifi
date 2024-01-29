@@ -51,6 +51,7 @@ typedef struct LightUnit_t
 
 LightUnitId addLightUnit(const LightUnit &lightUnit);
 void setLightUnit(LightUnitId id, const LightUnit &lightUnit, bool rmBeforeAdd = true, bool quiet = false);
+void resetLightUnitAge(LightUnitId id);
 void rmLightUnit(LightUnitId id);
 void rmLightUnits();
 bool lightUnitExists(LightUnitId id, LightUnit *lightUnitPtr = nullptr);

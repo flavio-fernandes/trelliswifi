@@ -126,6 +126,14 @@ LightUnit * getFirstLightUnit()
   return (iter == lightUnits.rend()) ? nullptr : &(*iter).second;
 }
 
+void resetLightUnitAge(LightUnitId id)
+{
+  LightUnits::iterator iter(lightUnits.find((LightUnitId)id));
+  if (iter != lightUnits.end()) {
+    (*iter).second.state.age = 0;
+  }
+}
+
 LightUnit * getNextLightUnit(LightUnitId id)
 {
   // Note: iterate backwards to give priority to ids explicitly used

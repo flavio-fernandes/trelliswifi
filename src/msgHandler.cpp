@@ -142,6 +142,9 @@ void handleSetLightUnit()
       LightUnit currLightUnit;
       assert(lightUnitExists(lightUnitId, &currLightUnit));
 
+      // Reset age of existing unit. Do it so expiration accounts for this update
+      resetLightUnitAge(lightUnitId);
+
       if (equivalentLightUnits(currLightUnit, lightUnit))
       {
 #ifdef DEBUG
